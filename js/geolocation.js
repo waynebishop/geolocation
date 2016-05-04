@@ -1,4 +1,5 @@
 var mainMap;
+var allMarkers = []; 
 
 function initMap() {
 
@@ -57,13 +58,112 @@ function placeStoreMarkers() {
 				
 			},
 			map: mainMap,
-			title: locations[i].title	
+			title: locations[i].title,
+			icon: "http://placehold.it/50x50",
+			id: i	
+		});
+
+		// Store this marker in the collection
+		allMarkers.push(marker);
+
+	}
+
+	// Show the contents of the allMarkers array
+	console.log(allMarkers);
+
+	// Populate the store picker
+	populateStorePicker(locations);
+
+}
+
+function populateStorePicker(locations) {
+
+	console.log(locations);
+
+	// Find the store picker element
+	var storePickerElement = document.querySelector('#store-picker');
+
+	// Create a "Please select... option"
+	var optionElement = document.createElement('option');	
+	optionElement.innerHTML = "Please select a store...";
+	storePickerElement.appendChild(optionElement); 
+
+
+
+	// Create all the location options
+	for( var i=0; i<locations.length; i++ ) {
+
+		// Create a new option element
+		var optionElement = document.createElement('option');
+
+		// Put the name of this store in the option element
+		optionElement.innerHTML = locations[i].title;
+
+		// Put this new option element in the select
+		storePickerElement.appendChild(optionElement); 		
+
+	}
+
+	// Listen for changes in the slect element
+	storePickerElement.onchange = showChosenLocation;
+
+}
+
+function showChosenLocation() {
+
+	// Get he element that triggered this function
+	var selectElement = this;
+
+	// Get the index of the option that was chosen
+	var selectedOptionIndex = selectElement.selectedIndex;
+
+	// Get the option that was selected
+	var optionElement = selectElement[selectedOptionIndex];
+
+	// Grab the text that is inside of this option
+	var optionText = optionElement.value;
+
+	// this[this.selectedIndex].value;      THIS WAS THE SHORTER VERSION OF CODE ABOVE 
+
+	//Find the marker that matches the chosen option
+	var theChosenMarker; 
+	for( var i=0; i<allMarkers.length; i++ ) {
+
+		// Is this this marker
+		if( optionText == allMarkers[i].title ) {
+			// Found!
+			theChosenMarker = allMarkers[i];
+			// Make sure the loop finishes by setting i to max number so won't run again
+			i = allMarkers.length;
+		}
+
+	}
+
+	// Only if we found a marker
+	if( theChosenMarker != undefined ) {
+
+		// Make google Maps focus on the marker position
+		mainMap.panTo({
+			lat: theChosenMarker.getPosition().lat(),
+			lng: theChosenMarker.getPosition().lng()
 		});
 
 	}
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
